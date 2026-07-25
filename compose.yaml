@@ -1,0 +1,55 @@
+services:
+  node-env:
+    container_name: node-env
+    tty: true
+    stdin_open: true
+    volumes:
+      - type: bind
+        source: .
+        target: /home/ubuntu/products-service
+    build:
+      dockerfile: Dockerfile
+      context: .
+      args:
+        - APP_DIR=/home/ubuntu/products-service
+        - HOME_DIR=/root
+      target: node-env
+  products-service-development:
+    container_name: products-service-development
+    build:
+      dockerfile: Dockerfile
+      context: .
+      args:
+        - APP_DIR=/home/ubuntu/products-service
+        - HOME_DIR=/root
+      target: products-service-development
+    command: yarn start:dev
+    environment:
+      - PORT=8001
+    ports:
+      - 8001:8001
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /home/ubuntu/products-service/src
+          initial_sync: true
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: package.json
+        - action: rebuild
+          path: tsconfig.json
+        - action: rebuild
+          path: Dockerfile.development
+  products-service-production:
+    container_name: products-service-production
+    environment:
+      - PORT=3002
+    ports:
+      - 3002:3002
+    build:
+      dockerfile: Dockerfile.production
+      context: .
+      args:
+        - APP_DIR=/home/ubuntu/products-service

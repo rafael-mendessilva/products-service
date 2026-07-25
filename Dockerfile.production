@@ -1,0 +1,43 @@
+# specify the node base image with your desired version node:<version>
+ARG NODE_VERSION=24.15.0
+
+FROM node:${NODE_VERSION} AS build
+
+ARG APP_DIR
+
+COPY ./src $APP_DIR/src
+
+COPY package.json $APP_DIR
+
+COPY tsconfig.build.json $APP_DIR
+
+COPY .yarnrc.yml $APP_DIR
+
+ENV NODE_ENV production
+
+WORKDIR $APP_DIR
+
+RUN corepack enable yarn \
+    && yarn set version stable
+
+RUN yarn
+
+RUN yarn build
+
+
+FROM node:${NODE_VERSION} as deploy
+
+ARG APP_DIR
+
+ENV NODE_ENV production
+
+COPY --from=build $APP_DIR/build $APP_DIR/build
+
+COPY --from=build $APP_DIR/package.json $APP_DIR
+
+COPY --from=build $APP_DIR/node_modules $APP_DIR/node_modules
+
+WORKDIR $APP_DIR
+
+CMD ["node","./build/."]
+
