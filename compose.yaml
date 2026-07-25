@@ -26,6 +26,11 @@ services:
     command: yarn start:dev
     environment:
       - PORT=8001
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_NAME=ecommerce
+      - DB_USER=products-service
+      - DB_PASSWORD=products-service
     ports:
       - 8001:8001
     develop:
@@ -42,6 +47,10 @@ services:
           path: tsconfig.json
         - action: rebuild
           path: Dockerfile.development
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true      
   products-service-production:
     container_name: products-service-production
     environment:
@@ -53,3 +62,18 @@ services:
       context: .
       args:
         - APP_DIR=/home/ubuntu/products-service
+  db:
+    container_name: products-service-db
+    image: mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-u$$MYSQL_USER", "-p$$MYSQL_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=ecommerce
+      - MYSQL_USER=products-service
+      - MYSQL_PASSWORD=products-service
+    ports:
+      - 3306:3306

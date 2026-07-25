@@ -1,9 +1,15 @@
 import { Injectable } from '@nestjs/common'
-
+import { Products } from './products.model'
+import { InjectModel } from '@nestjs/sequelize'
 @Injectable()
 export class ProductsService {
-  getProducts() {
-    return 'List of products'
+  constructor(
+    @InjectModel(Products)
+    private readonly products: typeof Products,
+  ) {}
+  async getProducts() {
+    const response = await this.products.findAll()
+    return response[0].id
   }
   getProductById() {
     return 'Product details'
