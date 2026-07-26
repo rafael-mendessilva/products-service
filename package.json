@@ -17,7 +17,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:e2e": "NODE_ENV=test yarn db:dev:init && jest --config ./test/jest-e2e.json",
     "db:dev:init": "yarn db:migrate && yarn db:seed:undo:all && yarn db:seed:all",
     "db:migrate": "sequelize db:migrate",
     "db:seed:all": "sequelize db:seed:all",

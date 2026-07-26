@@ -28,12 +28,11 @@ export class ProductsService {
   }
   async createProduct(params: { product: CreateProductDto }) {
     const { product } = params
-    return (
-      await this.products.create({
-        ...product,
-        price: product.priceInCents / 100,
-      })
-    ).productToken
+
+    return this.products.create({
+      ...product,
+      price: product.priceInCents / 100,
+    })
   }
   async updateProduct(params: {
     productToken: string

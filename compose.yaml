@@ -14,6 +14,9 @@ services:
         - APP_DIR=/home/ubuntu/products-service
         - HOME_DIR=/root
       target: node-env
+    networks:
+      - development
+      - tests-e2e  
   products-service-development:
     container_name: products-service-development
     build:
@@ -45,12 +48,41 @@ services:
           path: package.json
         - action: rebuild
           path: tsconfig.json
-        - action: rebuild
-          path: Dockerfile.development
     depends_on:
       products-service-db:
         condition: service_healthy
         restart: true      
+    networks:
+      - development
+  products-service-tests-e2e:
+    container_name: products-service-tests-e2e
+    tty: true
+    stdin_open: true
+    volumes:
+      - type: bind
+        source: .
+        target: /home/ubuntu/products-service
+    build:
+      dockerfile: Dockerfile
+      context: .
+      args:
+        - APP_DIR=/home/ubuntu/products-service
+        - HOME_DIR=/root
+      target: products-service-development
+    command: yarn test:e2e
+    environment:
+      - PORT=8001
+      - DB_HOST=products-service-db-tests-e2e
+      - DB_PORT=3306
+      - DB_NAME=ecommerce-test
+      - DB_USER=products-service-test
+      - DB_PASSWORD=products-service-test
+    depends_on:
+      products-service-db-tests-e2e:
+        condition: service_healthy
+        restart: true      
+    networks:
+      - tests-e2e
   products-service-production:
     container_name: products-service-production
     environment:
@@ -77,3 +109,30 @@ services:
       - MYSQL_PASSWORD=products-service
     ports:
       - 3306:3306
+    networks:
+      - development
+  products-service-db-tests-e2e:
+    container_name: products-service-db-tests-e2e
+    image: mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-u$$MYSQL_USER", "-p$$MYSQL_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=ecommerce-test
+      - MYSQL_USER=products-service-test
+      - MYSQL_PASSWORD=products-service-test
+    ports:
+      - 3307:3306
+    networks:
+      - tests-e2e
+
+networks:
+  development:
+    name: products-service-development-network
+    driver: bridge
+  tests-e2e:
+    name: products-service-tests-e2e-network
+    driver: bridge        

@@ -23,11 +23,11 @@ import {
 import { GetProductsResponse, GetProductResponse } from './responses'
 
 @UseInterceptors(ClassSerializerInterceptor)
+@UsePipes(new ValidationPipe({ transform: true }))
 @Controller('v1/products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
   @Get()
-  @UsePipes(new ValidationPipe({ transform: true }))
   async getProductsWithPagination(
     @Query() params: GetProductsWithPaginationDto,
   ) {
@@ -46,11 +46,11 @@ export class ProductsController {
   }
   @Put()
   @HttpCode(201)
-  createProduct(@Body() product: CreateProductDto) {
-    return this.productsService.createProduct({ product })
+  async reateProduct(@Body() product: CreateProductDto) {
+    await this.productsService.createProduct({ product })
   }
   @Patch(':productToken')
-  updateProduct(
+  async updateProduct(
     @Param() params: ProductTokenParamDto,
     @Body() product: UpdateProductDto,
   ) {
@@ -60,7 +60,7 @@ export class ProductsController {
     })
   }
   @Delete(':productToken')
-  deleteProduct(@Param() params: ProductTokenParamDto) {
+  async deleteProduct(@Param() params: ProductTokenParamDto) {
     return this.productsService.deleteProduct({
       productToken: params.productToken,
     })

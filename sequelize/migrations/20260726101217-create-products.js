@@ -18,7 +18,7 @@ module.exports = {
         allowNull: false
       },
       price: {
-        type: Sequelize.DECIMAL(undefined, 2),
+        type: Sequelize.DECIMAL(65, 2),
         allowNull: false
       },
       stock: {

@@ -92,7 +92,7 @@ describe('ProductsService', () => {
       stock: 10,
     } satisfies CreateProductDto
     const productToken = await service.createProduct({ product: newProduct })
-    expect(productToken).toEqual(mockedProducts.productToken)
+    expect(productToken).toEqual(mockedProducts)
     expect(model.create).toHaveBeenCalledWith({
       ...newProduct,
       price: newProduct.priceInCents / 100,
