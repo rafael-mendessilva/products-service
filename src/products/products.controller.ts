@@ -22,10 +22,10 @@ import {
 } from './dtos'
 import { GetProductsResponse, GetProductResponse } from './responses'
 
+@UseInterceptors(ClassSerializerInterceptor)
 @Controller('v1/products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
-  @UseInterceptors(ClassSerializerInterceptor)
   @Get()
   @UsePipes(new ValidationPipe({ transform: true }))
   async getProductsWithPagination(
@@ -41,9 +41,7 @@ export class ProductsController {
     const response = await this.productsService.getProduct({
       productToken: params.productToken,
     })
-    if (!response) {
-      return 'not found'
-    }
+
     return new GetProductResponse(response)
   }
   @Put()

@@ -26,7 +26,7 @@ services:
     command: yarn start:dev
     environment:
       - PORT=8001
-      - DB_HOST=db
+      - DB_HOST=products-service-db
       - DB_PORT=3306
       - DB_NAME=ecommerce
       - DB_USER=products-service
@@ -48,7 +48,7 @@ services:
         - action: rebuild
           path: Dockerfile.development
     depends_on:
-      db:
+      products-service-db:
         condition: service_healthy
         restart: true      
   products-service-production:
@@ -62,7 +62,7 @@ services:
       context: .
       args:
         - APP_DIR=/home/ubuntu/products-service
-  db:
+  products-service-db:
     container_name: products-service-db
     image: mysql
     healthcheck:

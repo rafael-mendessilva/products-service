@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { ProductsModel } from './models/products.model'
 import { InjectModel } from '@nestjs/sequelize'
+import { NotFoundError } from '../exceptions/errors'
 import {
   CreateProductDto,
   UpdateProductDto,
@@ -21,7 +22,9 @@ export class ProductsService {
   }
   async getProduct(params: { productToken: string }) {
     const { productToken } = params
-    return this.products.findOne({ where: { productToken } })
+    const products = await this.products.findOne({ where: { productToken } })
+    if (!products) throw new NotFoundError('Product not found')
+    return products
   }
   async createProduct(params: { product: CreateProductDto }) {
     const { product } = params
@@ -37,12 +40,23 @@ export class ProductsService {
     product: UpdateProductDto
   }) {
     const { productToken, product } = params
-    return this.products.update(product, {
+    const [affectedCount] = await this.products.update(product, {
       where: { productToken },
     })
+
+    if (affectedCount === 0)
+      throw new NotFoundError('Product not updated', {
+        cause: 'Product not found',
+      })
   }
   async deleteProduct(params: { productToken: string }) {
     const { productToken } = params
-    return this.products.destroy({ where: { productToken } })
+    const deletedCount = await this.products.destroy({
+      where: { productToken },
+    })
+    if (deletedCount === 0)
+      throw new NotFoundError('Product not deleted', {
+        cause: 'Product not found',
+      })
   }
 }

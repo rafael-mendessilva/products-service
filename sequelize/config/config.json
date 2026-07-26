@@ -3,7 +3,7 @@
     "username": "products-service",
     "password": "products-service",
     "database": "ecommerce",
-    "host": "db",
+    "host": "products-service-db",
     "dialect": "mysql"
   },
   "test": {

@@ -5,6 +5,8 @@ import { getModelToken } from '@nestjs/sequelize'
 import { InferAttributes } from 'sequelize'
 import { ProductsModel } from './models/products.model'
 import { beforeEach, describe, it, expect, jest } from '@jest/globals'
+import { NotFoundError } from '../exceptions/errors'
+import { CreateProductDto } from './dtos/product.dto'
 type ProductModelType = InferAttributes<ProductsModel>
 describe('ProductsService', () => {
   let service: ProductsService
@@ -12,10 +14,14 @@ describe('ProductsService', () => {
   let mockedProducts: ProductModelType
   beforeEach(async () => {
     mockedProducts = {
+      id: 1,
       productToken: 'mocked-product-token',
       name: 'Mocked Product',
       price: 10.22,
       stock: 10,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      version: 0,
     } satisfies ProductModelType
 
     const module: TestingModule = await Test.createTestingModule({
@@ -24,17 +30,19 @@ describe('ProductsService', () => {
         {
           provide: getModelToken(ProductsModel),
           useValue: {
-            findAll: jest
+            findAndCountAll: jest
               .fn()
-              .mockImplementation(() => Promise.resolve([mockedProducts])),
+              .mockImplementation(() =>
+                Promise.resolve({ count: 1, rows: [mockedProducts] }),
+              ),
             findOne: jest
               .fn()
               .mockImplementation(() => Promise.resolve(mockedProducts)),
             create: jest
               .fn()
               .mockImplementation(() => Promise.resolve(mockedProducts)),
-            update: jest.fn(),
-            destroy: jest.fn(),
+            update: jest.fn().mockImplementation(() => Promise.resolve([1])),
+            destroy: jest.fn().mockImplementation(() => Promise.resolve(1)),
           },
         },
       ],
@@ -44,10 +52,17 @@ describe('ProductsService', () => {
     model = module.get<typeof ProductsModel>(getModelToken(ProductsModel))
   })
 
-  it('should retrieve list of products', async () => {
-    const products = await service.getProducts()
-    expect(products).toEqual([mockedProducts])
-    expect(model.findAll).toHaveBeenCalled()
+  it('should retrieve list of products with pagination', async () => {
+    const result = await service.getProductsWithPagination({
+      page: 1,
+      limit: 10,
+    })
+    expect(result).toEqual({ count: 1, rows: [mockedProducts] })
+    expect(model.findAndCountAll).toHaveBeenCalledWith({
+      offset: 0,
+      limit: 10,
+      order: ['id'],
+    })
   })
 
   it('should retrieve a product by token', async () => {
@@ -60,13 +75,22 @@ describe('ProductsService', () => {
     })
   })
 
+  it('should throw NotFoundError when product does not exist', async () => {
+    jest.spyOn(model, 'findOne').mockImplementation(() => Promise.resolve(null))
+    await expect(
+      service.getProduct({
+        productToken: 'non-existent-token',
+      }),
+    ).rejects.toThrow(NotFoundError)
+  })
+
   it('should create a new product', async () => {
     const newProduct = {
       productToken: 'new-product-token',
       name: 'New Product',
       priceInCents: 1022,
       stock: 10,
-    }
+    } satisfies CreateProductDto
     const productToken = await service.createProduct({ product: newProduct })
     expect(productToken).toEqual(mockedProducts.productToken)
     expect(model.create).toHaveBeenCalledWith({
@@ -75,11 +99,11 @@ describe('ProductsService', () => {
     })
   })
 
-  it('should update a product', () => {
+  it('should update a product', async () => {
     const updatedProduct = {
       stock: 15,
     }
-    service.updateProduct({
+    await service.updateProduct({
       productToken: 'mocked-product-token',
       product: updatedProduct,
     })
@@ -88,10 +112,27 @@ describe('ProductsService', () => {
     })
   })
 
-  it('should delete a product', () => {
-    service.deleteProduct({ productToken: 'mocked-product-token' })
+  it('should throw NotFoundError when updating non-existent product', async () => {
+    jest.spyOn(model, 'update').mockImplementation(() => Promise.resolve([0]))
+    await expect(
+      service.updateProduct({
+        productToken: 'non-existent-token',
+        product: { stock: 15 },
+      }),
+    ).rejects.toThrow(NotFoundError)
+  })
+
+  it('should delete a product', async () => {
+    await service.deleteProduct({ productToken: 'mocked-product-token' })
     expect(model.destroy).toHaveBeenCalledWith({
       where: { productToken: 'mocked-product-token' },
     })
+  })
+
+  it('should throw NotFoundError when deleting non-existent product', async () => {
+    jest.spyOn(model, 'destroy').mockImplementation(() => Promise.resolve(0))
+    await expect(
+      service.deleteProduct({ productToken: 'non-existent-token' }),
+    ).rejects.toThrow(NotFoundError)
   })
 })

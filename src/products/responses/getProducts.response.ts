@@ -1,7 +1,7 @@
 import { Transform } from 'class-transformer'
 import { ProductsModel } from '../models/products.model'
 
-class ProductResponse {
+export class ProductResponse {
   declare productToken: string
   declare name: string
   @Transform(({ value }: { value: number }) => value.toString() + ' €')
@@ -9,7 +9,7 @@ class ProductResponse {
   declare stock: number
   constructor(params: ProductsModel) {
     this.productToken = params.productToken
-    this.name = params.productToken
+    this.name = params.name
     this.price = params.price
     this.stock = params.stock
   }

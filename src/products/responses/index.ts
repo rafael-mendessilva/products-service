@@ -1,1 +1,5 @@
-export { GetProductsResponse, GetProductResponse } from './getProducts.response'
+export {
+  GetProductsResponse,
+  GetProductResponse,
+  ProductResponse,
+} from './getProducts.response'
