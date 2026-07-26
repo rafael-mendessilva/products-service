@@ -26,7 +26,6 @@ export default defineConfig({
   {
     languageOptions: {
       sourceType: 'commonjs',
-      parser: tseslint.parsers.typescript,
       parserOptions: {
         projectService: true,
         tsconfigRootDir: import.meta.dirname,

@@ -3,7 +3,7 @@ import { ProductsController } from './products.controller'
 import { ProductsService } from './products.service'
 
 import { InferAttributes } from 'sequelize'
-import { ProductsModel } from './products.model'
+import { ProductsModel } from './models/products.model'
 import { describe, expect, it, beforeEach, jest } from '@jest/globals'
 
 type ProductModelType = InferAttributes<ProductsModel>

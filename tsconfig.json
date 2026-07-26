@@ -26,6 +26,7 @@
     ],
   },
   "include": [
+    "sequelize/**/*",
     "src/**/*",
     "test/**/*",
   ],

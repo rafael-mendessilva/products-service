@@ -33,7 +33,14 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
+      },
+      version: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
+        defaultValue: 0
       }
+    }, {
+      version: true,
     });
   },
   async down(queryInterface, Sequelize) {

@@ -1,15 +1,23 @@
 import { Injectable } from '@nestjs/common'
-import { ProductsModel } from './products.model'
+import { ProductsModel } from './models/products.model'
 import { InjectModel } from '@nestjs/sequelize'
-import { CreateProductDto, UpdateProductDto } from './dtos'
+import {
+  CreateProductDto,
+  UpdateProductDto,
+  GetProductsWithPaginationDto,
+} from './dtos'
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectModel(ProductsModel)
     private readonly products: typeof ProductsModel,
   ) {}
-  async getProducts() {
-    return this.products.findAll()
+  async getProductsWithPagination(params: GetProductsWithPaginationDto) {
+    return this.products.findAndCountAll({
+      offset: (params.page - 1) * params.limit,
+      limit: params.limit,
+      order: ['id'],
+    })
   }
   async getProduct(params: { productToken: string }) {
     const { productToken } = params

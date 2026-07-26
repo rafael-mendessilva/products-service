@@ -7,25 +7,44 @@ import {
   Param,
   HttpCode,
   Patch,
+  Query,
+  UsePipes,
+  ValidationPipe,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common'
 import { ProductsService } from './products.service'
 import {
   CreateProductDto,
   ProductTokenParamDto,
   UpdateProductDto,
+  GetProductsWithPaginationDto,
 } from './dtos'
+import { GetProductsResponse, GetProductResponse } from './responses'
+
 @Controller('v1/products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get()
-  getProducts() {
-    return this.productsService.getProducts()
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async getProductsWithPagination(
+    @Query() params: GetProductsWithPaginationDto,
+  ) {
+    const response =
+      await this.productsService.getProductsWithPagination(params)
+
+    return new GetProductsResponse(response)
   }
   @Get(':productToken')
-  getProduct(@Param() params: ProductTokenParamDto) {
-    return this.productsService.getProduct({
+  async getProduct(@Param() params: ProductTokenParamDto) {
+    const response = await this.productsService.getProduct({
       productToken: params.productToken,
     })
+    if (!response) {
+      return 'not found'
+    }
+    return new GetProductResponse(response)
   }
   @Put()
   @HttpCode(201)

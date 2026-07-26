@@ -3,7 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { ProductsService } from './products.service'
 import { getModelToken } from '@nestjs/sequelize'
 import { InferAttributes } from 'sequelize'
-import { ProductsModel } from './products.model'
+import { ProductsModel } from './models/products.model'
 import { beforeEach, describe, it, expect, jest } from '@jest/globals'
 type ProductModelType = InferAttributes<ProductsModel>
 describe('ProductsService', () => {
