@@ -1,24 +1,33 @@
 {
+  "extends": [
+    "@tsconfig/node24",
+  ],
   "compilerOptions": {
     "module": "nodenext",
-    "moduleResolution": "nodenext",
     "resolvePackageJsonExports": true,
-    "esModuleInterop": true,
     "isolatedModules": true,
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "ES2023",
+    "rootDir": ".",
     "sourceMap": true,
-    "outDir": "./dist",
+    "outDir": "dist",
     "incremental": true,
-    "skipLibCheck": true,
     "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": true,
     "strictBindCallApply": true,
-    "noFallthroughCasesInSwitch": true
-  }
+    "noFallthroughCasesInSwitch": true,
+  },
+  "include": [
+    "src/**/*",
+    "test/**/*",
+  ],
+  "exclude": [
+    "dist/**",
+    "build/**",
+    "node_modules/**",
+  ]
 }

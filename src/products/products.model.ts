@@ -2,20 +2,18 @@ import { Column, Model, Table } from 'sequelize-typescript'
 import { DataTypes } from 'sequelize'
 @Table({
   version: true,
+  tableName: 'products',
 })
-export class Products extends Model<Products, Exclude<Products, 'id'>> {
-  @Column({ type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true })
-  id: number = 0
-
+export class ProductsModel extends Model {
   @Column({ type: DataTypes.STRING, unique: true })
-  productToken: string = ''
+  declare productToken: string
 
   @Column({ type: DataTypes.STRING })
-  name: string = ''
+  declare name: string
 
-  @Column({ type: DataTypes.DECIMAL(10, 2) })
-  price: number = 0.0
+  @Column({ type: DataTypes.DECIMAL(undefined, 2) })
+  declare price: number
 
   @Column({ type: DataTypes.INTEGER })
-  stock: number = 0
+  declare stock: number
 }

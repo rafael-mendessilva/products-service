@@ -3,27 +3,18 @@ import eslint from '@eslint/js';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
+import { defineConfig } from 'eslint/config'
 
-export default tseslint.config(
-  {
-    ignores: ['eslint.config.mjs'],
-  },
+export default defineConfig({
+  ignores: [
+    'eslint.config.mjs',
+    'build/**',
+    'node_modules/**',
+  ],
+},
   eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
   eslintPluginPrettierRecommended,
-  {
-    languageOptions: {
-      globals: {
-        ...globals.node,
-        ...globals.jest,
-      },
-      sourceType: 'commonjs',
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
-  },
   {
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
@@ -32,4 +23,19 @@ export default tseslint.config(
       "prettier/prettier": ["error", { endOfLine: "auto", semi: false }],
     },
   },
-);
+  {
+    languageOptions: {
+      sourceType: 'commonjs',
+      parser: tseslint.parsers.typescript,
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
+  {
+    files: ['**/*.spec.ts', '**/*.e2e-spec.ts'],
+    extends: [tseslint.configs.disableTypeChecked],
+
+  }
+)
