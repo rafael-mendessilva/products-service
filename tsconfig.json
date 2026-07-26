@@ -4,6 +4,7 @@
   ],
   "compilerOptions": {
     "module": "nodenext",
+    "target": "es2025",
     "resolvePackageJsonExports": true,
     "isolatedModules": true,
     "declaration": true,
@@ -20,6 +21,9 @@
     "noImplicitAny": true,
     "strictBindCallApply": true,
     "noFallthroughCasesInSwitch": true,
+    "types": [
+      "node"
+    ],
   },
   "include": [
     "src/**/*",
@@ -28,6 +32,5 @@
   "exclude": [
     "dist/**",
     "build/**",
-    "node_modules/**",
   ]
 }
