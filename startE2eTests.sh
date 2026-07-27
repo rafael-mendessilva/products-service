@@ -15,4 +15,4 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "Starting development environment..."
-docker compose up products-service-tests-e2e -d --build && docker compose attach products-service-tests-e2e
+docker compose -f compose.e2e.yaml up products-service-tests-e2e -d --build && docker compose -f compose.e2e.yaml attach products-service-tests-e2e

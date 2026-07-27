@@ -1,4 +1,18 @@
 {
-  "extends": "./tsconfig.json",
-  "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]
+  "extends": [
+    "@tsconfig/node24",
+  ],
+  "compilerOptions": {
+    "emitDecoratorMetadata": false,
+    "declaration": false,
+    "rootDir": "src",
+    "sourceMap": false,
+    "outDir": "dist",
+  },
+  "include": [
+    "src",
+  ],
+  "exclude": [
+    "**/*spec.ts"
+  ]
 }

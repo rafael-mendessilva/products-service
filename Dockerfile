@@ -2,9 +2,9 @@
 FROM ubuntu:latest AS os
 
 RUN apt-get update \
-    && apt-get upgrade \
+    && apt-get -y upgrade \
     && apt-get install -y curl \
-    && apt-get install libatomic1 \
+    && apt-get install -y libatomic1 \
     && apt-get install -y git-all \
     && apt-get autoremove
 

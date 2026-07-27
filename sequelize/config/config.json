@@ -10,14 +10,14 @@
     "username": "products-service-test",
     "password": "products-service-test",
     "database": "ecommerce-test",
-    "host": "products-service-db-tests-e2e",
+    "host": "products-service-tests-e2e-db",
     "dialect": "mysql"
   },
   "production": {
-    "username": "root",
-    "password": null,
-    "database": "database_production",
-    "host": "127.0.1.1",
+    "username": "products-service",
+    "password": "products-service",
+    "database": "ecommerce",
+    "host": "products-service-db-production",
     "dialect": "mysql"
   }
 }

@@ -1,0 +1,45 @@
+services:
+  products-service-tests-e2e:
+    container_name: products-service-tests-e2e
+    build:
+      dockerfile: Dockerfile
+      context: .
+      args:
+        - APP_DIR=/home/ubuntu/products-service
+        - HOME_DIR=/root
+      target: products-service-development
+    command: yarn test:e2e
+    environment:
+      - PORT=8001
+      - DB_HOST=products-service-tests-e2e-db
+      - DB_PORT=3306
+      - DB_NAME=ecommerce-test
+      - DB_USER=products-service-test
+      - DB_PASSWORD=products-service-test
+    depends_on:
+      products-service-tests-e2e-db:
+        condition: service_healthy
+        restart: true      
+    networks:
+      - tests-e2e
+  products-service-tests-e2e-db:
+    container_name: products-service-tests-e2e-db
+    image: mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-u$$MYSQL_USER", "-p$$MYSQL_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=ecommerce-test
+      - MYSQL_USER=products-service-test
+      - MYSQL_PASSWORD=products-service-test
+    networks:
+      - tests-e2e
+
+networks:
+  tests-e2e:
+    name: products-service-tests-e2e-network
+    driver: bridge    
+      

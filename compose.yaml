@@ -16,7 +16,7 @@ services:
       target: node-env
     networks:
       - development
-      - tests-e2e  
+      - production
   products-service-development:
     container_name: products-service-development
     build:
@@ -54,46 +54,29 @@ services:
         restart: true      
     networks:
       - development
-  products-service-tests-e2e:
-    container_name: products-service-tests-e2e
-    tty: true
-    stdin_open: true
-    volumes:
-      - type: bind
-        source: .
-        target: /home/ubuntu/products-service
-    build:
-      dockerfile: Dockerfile
-      context: .
-      args:
-        - APP_DIR=/home/ubuntu/products-service
-        - HOME_DIR=/root
-      target: products-service-development
-    command: yarn test:e2e
-    environment:
-      - PORT=8001
-      - DB_HOST=products-service-db-tests-e2e
-      - DB_PORT=3306
-      - DB_NAME=ecommerce-test
-      - DB_USER=products-service-test
-      - DB_PASSWORD=products-service-test
-    depends_on:
-      products-service-db-tests-e2e:
-        condition: service_healthy
-        restart: true      
-    networks:
-      - tests-e2e
   products-service-production:
     container_name: products-service-production
+    command: yarn start:prod
     environment:
       - PORT=3002
-    ports:
-      - 3002:3002
+      - DB_HOST=products-service-db-production
+      - DB_PORT=3306
+      - DB_NAME=ecommerce
+      - DB_USER=products-service
+      - DB_PASSWORD=products-service    
     build:
       dockerfile: Dockerfile.production
       context: .
       args:
-        - APP_DIR=/home/ubuntu/products-service
+        - APP_DIR=/home/ubuntu/products-service  
+    ports:
+      - 3002:3002
+    depends_on:
+      products-service-db-production:
+        condition: service_healthy
+        restart: true       
+    networks:
+      - production    
   products-service-db:
     container_name: products-service-db
     image: mysql
@@ -111,8 +94,8 @@ services:
       - 3306:3306
     networks:
       - development
-  products-service-db-tests-e2e:
-    container_name: products-service-db-tests-e2e
+  products-service-db-production:
+    container_name: products-service-db-production
     image: mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-u$$MYSQL_USER", "-p$$MYSQL_PASSWORD"]
@@ -121,18 +104,18 @@ services:
       retries: 5
     environment:
       - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=ecommerce-test
-      - MYSQL_USER=products-service-test
-      - MYSQL_PASSWORD=products-service-test
+      - MYSQL_DATABASE=ecommerce
+      - MYSQL_USER=products-service
+      - MYSQL_PASSWORD=products-service
     ports:
       - 3307:3306
     networks:
-      - tests-e2e
+      - production
 
 networks:
+  production:
+    name: products-service-production
+    driver: bridge   
   development:
     name: products-service-development-network
     driver: bridge
-  tests-e2e:
-    name: products-service-tests-e2e-network
-    driver: bridge        
