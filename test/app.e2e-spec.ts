@@ -70,6 +70,25 @@ describe('AppController (e2e)', () => {
         .expect(201)
     })
 
+    it('should fail with 409 when productToken already exists', async () => {
+      const duplicateProduct = {
+        productToken: 'test-product-token-conflict-' + Date.now(),
+        name: 'Test Product Conflict',
+        priceInCents: 9999,
+        stock: 50,
+      }
+
+      await request(app.getHttpServer())
+        .put('/v1/products')
+        .send(duplicateProduct)
+        .expect(201)
+
+      return request(app.getHttpServer())
+        .put('/v1/products')
+        .send(duplicateProduct)
+        .expect(409)
+    })
+
     it('should fail validation when productToken is missing', () => {
       const invalidProduct = {
         name: 'Test Product',

@@ -1,9 +1,6 @@
 {
-  "extends": [
-    "@tsconfig/node24",
-  ],
+  "extends": "./tsconfig.json",
   "compilerOptions": {
-    "emitDecoratorMetadata": false,
     "declaration": false,
     "rootDir": "src",
     "sourceMap": false,

@@ -5,8 +5,6 @@ FROM node:${NODE_VERSION} AS build
 
 ARG APP_DIR
 
-
-
 COPY ./src $APP_DIR/src
 
 COPY package.json $APP_DIR
@@ -17,30 +15,33 @@ COPY tsconfig.json $APP_DIR
 
 COPY .yarnrc.yml $APP_DIR
 
-ENV NODE_ENV production
+COPY yarn.lock $APP_DIR
+
+COPY .yarn $APP_DIR/.yarn
 
 WORKDIR $APP_DIR
 
 RUN corepack enable yarn \
     && yarn set version stable \
-#    && yarn install \
     && yarn config set --home enableTelemetry 0 \
-    && yarn -v
+    && yarn install
 
-RUN yarn install
-
-#RUN yarn build 
+RUN yarn build 
 
 
 FROM node:${NODE_VERSION} as deploy
 
 ARG APP_DIR
 
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
 COPY ./sequelize $APP_DIR/sequelize
 
 COPY .sequelizerc $APP_DIR
+
+COPY entrypoint.sh $APP_DIR
+
+RUN chmod +x $APP_DIR/entrypoint.sh
 
 COPY --from=build $APP_DIR/dist $APP_DIR/dist
 
@@ -49,4 +50,6 @@ COPY --from=build $APP_DIR/package.json $APP_DIR
 COPY --from=build $APP_DIR/node_modules $APP_DIR/node_modules
 
 WORKDIR $APP_DIR
+
+ENTRYPOINT ["./entrypoint.sh"]
 

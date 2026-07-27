@@ -56,7 +56,6 @@ services:
       - development
   products-service-production:
     container_name: products-service-production
-    command: yarn start:prod
     environment:
       - PORT=3002
       - DB_HOST=products-service-db-production
@@ -108,7 +107,7 @@ services:
       - MYSQL_USER=products-service
       - MYSQL_PASSWORD=products-service
     ports:
-      - 3307:3306
+      - 3308:3306
     networks:
       - production
 
